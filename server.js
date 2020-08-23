@@ -20,7 +20,9 @@ let dbConnection = {
 if (process.env.NODE_ENV === 'production') {
   dbConnection = {
     connectionString: process.env.DATABASE_URL,
-    ssl: true,
+    ssl: {
+      rejectUnauthorized: false,
+    },
   };
 }
 
