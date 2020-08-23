@@ -10,14 +10,23 @@ const signin = require('./controllers/signin');
 const profile = require('./controllers/profile');
 const image = require('./controllers/image');
 
+let dbConnection = {
+  host: '127.0.0.1',
+  user: 'postgres',
+  password: '12345',
+  database: 'smart-face-detection',
+};
+
+if (process.env.NODE_ENV === 'production') {
+  dbConnection = {
+    connectionString: process.env.DATABASE_URL,
+    ssl: true,
+  };
+}
+
 const db = knex({
   client: 'pg',
-  connection: {
-    host: '127.0.0.1',
-    user: 'postgres',
-    password: '12345',
-    database: 'smart-face-detection',
-  },
+  connection: dbConnection,
 });
 
 const app = express();
@@ -48,5 +57,5 @@ app.post('/imageurl', (req, res) => {
 });
 
 app.listen(process.env.PORT || 3001, () => {
-  console.log(`app is running on port 3000 || ${process.env.PORT}`);
+  console.log(`app is running on port 3001 || ${process.env.PORT}`);
 });
