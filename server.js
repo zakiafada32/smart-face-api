@@ -10,12 +10,7 @@ const signin = require('./controllers/signin');
 const profile = require('./controllers/profile');
 const image = require('./controllers/image');
 
-let dbConnection = {
-  host: '127.0.0.1',
-  user: 'postgres',
-  password: '12345',
-  database: 'smart-face-detection',
-};
+let dbConnection = {};
 
 if (process.env.NODE_ENV === 'production') {
   dbConnection = {
@@ -23,6 +18,13 @@ if (process.env.NODE_ENV === 'production') {
     ssl: {
       rejectUnauthorized: false,
     },
+  };
+} else {
+  dbConnection = {
+    host: '127.0.0.1',
+    user: 'postgres',
+    password: '12345',
+    database: 'smart-face-detection',
   };
 }
 
