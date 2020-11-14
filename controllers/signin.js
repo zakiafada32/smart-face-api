@@ -1,24 +1,28 @@
 const jwt = require('jsonwebtoken');
-const redis = require('redis');
+// const redis = require('redis');
 
 // redis setup
-const redisClient = redis.createClient();
+// const redisClient = redis.createClient();
 
-const signToken = (username) => {
-  const jwtPayload = { username };
-  return jwt.sign(jwtPayload, 'JWT_SECRET_KEY', { expiresIn: '2 days' });
+const signToken = (email, id) => {
+  const jwtPayload = { email, id };
+  return jwt.sign(jwtPayload, process.env.JWT_SECRET_KEY, {
+    expiresIn: '2 days',
+  });
 };
 
-const setToken = (key, value) => Promise.resolve(redisClient.set(key, value));
+// const setToken = (key, value) => Promise.resolve(redisClient.set(key, value));
 
 const createSession = (user) => {
   const { email, id } = user;
-  const token = signToken(email);
-  return setToken(token, id)
-    .then(() => {
-      return { success: 'true', userId: id, token, user };
-    })
-    .catch(console.log);
+  const token = signToken(email, id);
+  console.log(token);
+  return { success: 'true', userId: id, token, user };
+  // return setToken(token, id)
+  //   .then(() => {
+  //     return { success: 'true', userId: id, token, user };
+  //   })
+  //   .catch(console.log);
 };
 
 const handleSignin = (db, bcrypt, req, res) => {
@@ -48,12 +52,22 @@ const handleSignin = (db, bcrypt, req, res) => {
 
 const getAuthTokenId = (req, res) => {
   const { authorization } = req.headers;
-  return redisClient.get(authorization, (err, reply) => {
-    if (err || !reply) {
-      return res.status(401).send('Unauthorized');
+  return jwt.verify(
+    authorization,
+    process.env.JWT_SECRET_KEY,
+    (err, decoded) => {
+      if (err) {
+        return res.status(401).send('Unauthorized');
+      }
+      return res.json({ id: decoded.id });
     }
-    return res.json({ id: reply });
-  });
+  );
+  // return redisClient.get(authorization, (err, reply) => {
+  //   if (err || !reply) {
+  //     return res.status(401).send('Unauthorized');
+  //   }
+  //   return res.json({ id: reply });
+  // });
 };
 
 const signinAuthentication = (db, bcrypt) => (req, res) => {
@@ -70,5 +84,5 @@ const signinAuthentication = (db, bcrypt) => (req, res) => {
 
 module.exports = {
   signinAuthentication: signinAuthentication,
-  redisClient: redisClient,
+  // redisClient: redisClient,
 };
