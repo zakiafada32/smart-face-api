@@ -7,8 +7,8 @@ Full-stack web application that detect a face within a submitted image using a C
 ## Tools and Technologies Used
 
 - React
-- Redux
-- Firebase
+- Node.js
 - Express.js
-- Stripe API
-- Heroku
+- PostgreSQL
+- JSON Web Token
+- Clarifai API
